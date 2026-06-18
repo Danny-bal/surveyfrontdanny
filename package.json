@@ -1,0 +1,31 @@
+{
+  "name": "survey-danny-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "build": "vue-tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@primeuix/themes": "latest",
+    "axios": "latest",
+    "chart.js": "^4.5.1",
+    "lucide-vue-next": "latest",
+    "pinia": "latest",
+    "primeicons": "latest",
+    "primevue": "latest",
+    "vue": "latest",
+    "vue-router": "latest",
+    "xlsx-js-style": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "@vitejs/plugin-vue": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vue-tsc": "latest"
+  }
+}
