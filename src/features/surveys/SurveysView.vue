@@ -15,6 +15,7 @@ import {
 } from 'lucide-vue-next';
 import PageHeader from '@/components/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
+import ConfirmDeleteDialog from '@/components/ConfirmDeleteDialog.vue';
 import { getApiMessage } from '@/api/http';
 import { getSurveyAnswersByClient } from '@/api/reportApi';
 import { getSurveyForClient } from '@/api/publicSurveyApi';
@@ -42,6 +43,8 @@ const surveyRows = ref<SurveyManagerRow[]>([]);
 const loading = ref(true);
 const error = ref('');
 const success = ref('');
+const surveyPendingDelete = ref<SurveyManagerRow | null>(null);
+const deletingSurvey = ref(false);
 const search = ref('');
 const statusFilter = ref<StatusFilter>('Todas');
 const dateFilter = ref<DateFilter>('Todas');
@@ -257,19 +260,36 @@ async function loadSurveys() {
   }
 }
 
-async function removeSurvey(row: SurveyManagerRow) {
-  const accepted = window.confirm(`Eliminar "${row.survey.surTitle}"`);
+function removeSurvey(row: SurveyManagerRow) {
+  surveyPendingDelete.value = row;
+}
 
-  if (!accepted) {
+function cancelSurveyDeletion() {
+  if (!deletingSurvey.value) {
+    surveyPendingDelete.value = null;
+  }
+}
+
+async function confirmSurveyDeletion() {
+  const row = surveyPendingDelete.value;
+
+  if (!row) {
     return;
   }
 
+  deletingSurvey.value = true;
+  error.value = '';
+  success.value = '';
+
   try {
     await deleteSurvey(row.survey.id);
+    surveyPendingDelete.value = null;
     await loadSurveys();
     success.value = 'Encuesta eliminada correctamente';
   } catch (err) {
     error.value = getApiMessage(err);
+  } finally {
+    deletingSurvey.value = false;
   }
 }
 
@@ -278,6 +298,15 @@ onMounted(loadSurveys);
 
 <template>
   <main class="page">
+    <ConfirmDeleteDialog
+      :open="surveyPendingDelete !== null"
+      title="¿Eliminar esta encuesta?"
+      :item-name="surveyPendingDelete?.survey.surTitle ?? ''"
+      :loading="deletingSurvey"
+      @cancel="cancelSurveyDeletion"
+      @confirm="confirmSurveyDeletion"
+    />
+
     <PageHeader title="Mis encuestas" eyebrow="Gestion" description="Gestiona, comparte y revisa tus encuestas">
       <div class="header-actions">
         <RouterLink class="secondary-button compact" to="/surveys/generate">

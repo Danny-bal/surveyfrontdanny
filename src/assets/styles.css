@@ -2612,6 +2612,11 @@ td {
   padding: 18px;
 }
 
+.public-back-button {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 .public-header h1 {
   margin: 2px 0 0;
   color: #111827;
@@ -3295,6 +3300,16 @@ td {
 
   .participant-answer-list {
     grid-template-columns: 1fr;
+  }
+
+  .public-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .public-back-button {
+    width: 100%;
+    margin-left: 0;
   }
 
   .question-bank-table-heading,

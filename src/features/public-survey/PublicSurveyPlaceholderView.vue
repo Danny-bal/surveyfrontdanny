@@ -504,6 +504,10 @@ onMounted(loadSurvey);
           <span>SurveyDanny</span>
           <h1>{{ survey.surveyName }}</h1>
         </div>
+        <RouterLink class="secondary-button compact public-back-button" :to="{ name: 'respond-surveys' }">
+          <ArrowLeft :size="18" />
+          <span>Regresar</span>
+        </RouterLink>
       </header>
 
       <p v-if="error" class="inline-error">{{ error }}</p>

@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { Copy, FileText, Layers3, Pencil, Plus, Search, ScrollText, Trash2 } from 'lucide-vue-next';
 import PageHeader from '@/components/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
+import ConfirmDeleteDialog from '@/components/ConfirmDeleteDialog.vue';
 import { getApiMessage } from '@/api/http';
 import { createQuestion, deleteQuestion, getQuestions } from '@/api/questionApi';
 import type { Question } from '@/types/api';
@@ -10,6 +11,8 @@ import type { Question } from '@/types/api';
 const questions = ref<Question[]>([]);
 const loading = ref(true);
 const duplicatingId = ref<number | null>(null);
+const questionPendingDelete = ref<Question | null>(null);
+const deletingQuestion = ref(false);
 const error = ref('');
 const success = ref('');
 const search = ref('');
@@ -164,19 +167,36 @@ async function duplicateQuestion(question: Question) {
   }
 }
 
-async function removeQuestion(question: Question) {
-  const accepted = window.confirm(`Eliminar "${question.queName}"`);
+function removeQuestion(question: Question) {
+  questionPendingDelete.value = question;
+}
 
-  if (!accepted) {
+function cancelQuestionDeletion() {
+  if (!deletingQuestion.value) {
+    questionPendingDelete.value = null;
+  }
+}
+
+async function confirmQuestionDeletion() {
+  const question = questionPendingDelete.value;
+
+  if (!question) {
     return;
   }
 
+  deletingQuestion.value = true;
+  error.value = '';
+  success.value = '';
+
   try {
     await deleteQuestion(question.id);
+    questionPendingDelete.value = null;
     await loadQuestions();
     success.value = 'Pregunta eliminada correctamente';
   } catch (err) {
     error.value = getApiMessage(err);
+  } finally {
+    deletingQuestion.value = false;
   }
 }
 
@@ -185,6 +205,15 @@ onMounted(loadQuestions);
 
 <template>
   <main class="page">
+    <ConfirmDeleteDialog
+      :open="questionPendingDelete !== null"
+      title="¿Eliminar esta pregunta?"
+      :item-name="questionPendingDelete?.queName ?? ''"
+      :loading="deletingQuestion"
+      @cancel="cancelQuestionDeletion"
+      @confirm="confirmQuestionDeletion"
+    />
+
     <PageHeader title="Preguntas" eyebrow="Banco" description="Administra y organiza tu banco de preguntas">
       <RouterLink class="primary-button compact" to="/questions/new">
         <Plus :size="18" />
