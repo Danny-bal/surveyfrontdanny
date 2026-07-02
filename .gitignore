@@ -1,7 +1,28 @@
-node_modules
-dist
-.env
-.env.local
-.DS_Store
-*.log
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
 *.tsbuildinfo
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Logs and generated test artifacts
+*.log
+.playwright-cli/
+playwright-report/
+test-results/
+coverage/
+
+# Hosting/tool caches
+.vercel/
+.netlify/
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
